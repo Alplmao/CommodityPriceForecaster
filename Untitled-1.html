@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commodity Price Forecast</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 20px;
+        }
+
+        .left-panel {
+            flex: 1;
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .right-panel {
+            width: 400px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #2c3e50;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .price-up {
+            color: #27ae60;
+        }
+
+        .price-down {
+            color: #e74c3c;
+        }
+
+        .price-stable {
+            color: #555;
+        }
+
+        .ai-refresh {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .refresh-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .refresh-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .last-updated {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <h2>Commodity Analysis</h2>
+            <p>This page provides price forecasts for key commodities.</p>
+        </div>
+        <div class="right-panel">
+            <div class="ai-refresh">
+                <h2>Price Predictions</h2>
+                <div>
+                    <button class="refresh-btn" onclick="refreshPredictions()">Refresh</button>
+                    <span class="last-updated" id="lastUpdated"></span>
+                </div>
+            </div>
+            <table id="predictionsTable">
+                <thead>
+                    <tr>
+                        <th>Commodity</th>
+                        <th>Latest Price (TL)</th>
+                        <th>Predicted Price (TL)</th>
+                        <th>Change</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="deepseek_javascript_20250423_d30623.js"></script>
+    <script>
+        function fillTable(data) {
+            const tbody = document.querySelector("#predictionsTable tbody");
+            tbody.innerHTML = "";
+
+            for (const commodity in data) {
+                const item = data[commodity];
+                const row = document.createElement("tr");
+
+                const productCell = document.createElement("td");
+                productCell.textContent = commodity;
+
+                const priceCell = document.createElement("td");
+                priceCell.textContent = item.latest_price + " TL";
+
+                const predictedCell = document.createElement("td");
+                predictedCell.textContent = item.predicted_price + " TL";
+
+                const changeCell = document.createElement("td");
+                const change = item.predicted_price - item.latest_price;
+                if (change > 0) {
+                    changeCell.textContent = "▲ " + change.toFixed(2) + " TL";
+                    changeCell.classList.add("price-up");
+                } else if (change < 0) {
+                    changeCell.textContent = "▼ " + Math.abs(change).toFixed(2) + " TL";
+                    changeCell.classList.add("price-down");
+                } else {
+                    changeCell.textContent = "-";
+                    changeCell.classList.add("price-stable");
+                }
+
+                row.appendChild(productCell);
+                row.appendChild(priceCell);
+                row.appendChild(predictedCell);
+                row.appendChild(changeCell);
+                tbody.appendChild(row);
+            }
+            document.getElementById("lastUpdated").textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+        }
+
+        window.onload = refreshPredictions;
+    </script>
+</body>
+</html>
